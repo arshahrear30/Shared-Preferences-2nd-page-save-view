@@ -1,0 +1,69 @@
+package com.hello.oflineautodatasave;
+
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText edName;
+    Button buttonSave, bNext;
+
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+
+        edName = findViewById(R.id.edName);
+        buttonSave = findViewById(R.id.buttonSave);
+        bNext = findViewById(R.id.bNext);
+
+// sharedPreferences কে findViewById এর মতো পরিচয় করানো যাবে না । এটার নিয়ম ভিন্ন ।
+        sharedPreferences = getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE);
+        //যেখানে data save করবো ঐ string variable নাম দিবো। সাধারনত সেটাকে auto app_name হিসেবে নেয়া যায় ।
+        // ফলে app name ই variable name ।app_name না দিয়ে অন্য কিছু দিলে অন্য class থেকে access করতে গেলে variable name type mistake হতে পারে ।
+        editor = sharedPreferences.edit();
+//MODE_PRIVATE দিচি যাতে user এর data অন্য কেউ access না করতে পারে ।
+
+        String name = sharedPreferences.getString("name",  "Null Value");
+// ai line a problem korci
+        buttonSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String name = edName.getText().toString();
+                editor.putString("name", "" + name);
+                editor.putInt("age", 22);
+                editor.apply();
+            }
+        });
+
+        bNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent( MainActivity.this, MainActivity2.class));
+            }
+        });
+
+
+
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+    }
+}
